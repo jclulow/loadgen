@@ -1,0 +1,9 @@
+#!/bin/ksh
+
+set -o errexit
+
+DIR=$(cd $(dirname $(whence $0))/.. && pwd)
+NAME=$(basename $0)
+
+${DIR}/node/bin/node ${DIR}/cmd/${NAME}.js "$@" |
+  ${DIR}/node/bin/node ${DIR}/node_modules/.bin/bunyan -o short

@@ -1,0 +1,19 @@
+{
+  "name": "loadgen",
+  "version": "0.0.0",
+  "description": "Load Generator",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Joshua M. Clulow <jmc@joyent.com>",
+  "license": "ISC",
+  "dependencies": {
+    "vasync": "^1.4.3",
+    "watershed": "^0.3.0",
+    "bunyan": "^0.22.1",
+    "restify": "^2.6.3",
+    "assert-plus": "^0.1.5",
+    "jsprim": "^0.5.1"
+  }
+}
