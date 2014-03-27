@@ -10,10 +10,13 @@
   "license": "ISC",
   "dependencies": {
     "vasync": "^1.4.3",
+    "verror": "^1.4.0",
     "watershed": "^0.3.0",
     "bunyan": "^0.22.1",
     "restify": "^2.6.3",
     "assert-plus": "^0.1.5",
-    "jsprim": "^0.5.1"
+    "jsprim": "^0.5.1",
+    "backoff": "^2.3.0",
+    "node-uuid": "^1.4.1"
   }
 }

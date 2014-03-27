@@ -4,6 +4,7 @@ var mod_bunyan = require('bunyan');
 var mod_restify = require('restify');
 var mod_assert = require('assert-plus');
 var mod_watershed = require('watershed');
+var mod_uuid = require('node-uuid');
 
 var lib_common = require('../lib/common');
 
@@ -32,6 +33,16 @@ find_client(name)
 	return (null);
 }
 
+setInterval(function () {
+	for (var i = 0; i < CLIENTS.length; i++) {
+		var client = CLIENTS[i];
+		
+		if (client.cl_shed) {
+			client.cl_shed.send('ping');
+		}
+	}
+}, 8000);
+
 function
 register_client(name, shed, callback)
 {
@@ -47,7 +58,8 @@ register_client(name, shed, callback)
 			cl_name: name,
 			cl_shed: shed,
 			cl_first_conn: Date.now(),
-			cl_last_conn: Date.now()
+			cl_last_conn: Date.now(),
+			cl_identity: null
 		};
 		CLIENTS.push(client);
 	} else if (client.cl_shed) {
@@ -90,6 +102,9 @@ register_client(name, shed, callback)
 
 	var hello_count = 0;
 	shed.on('text', function (text) {
+		if (text === 'ping')
+			return;
+
 		var obj = JSON.parse(text);
 
 		switch (obj.type) {
@@ -99,10 +114,36 @@ register_client(name, shed, callback)
 				setImmediate(callback);
 			}
 			break;
+		case 'identity':
+			log.info({
+				identity: obj.identity
+			}, 'received client identity');
+			client.cl_identity = obj.identity;
+			break;
+		case 'need_work':
+			setTimeout(function () {
+				shed.send(JSON.stringify({
+					type: 'schedule',
+					state: {
+						job: mod_uuid.v4(),
+						command: 'bash',
+						args: [
+							'-c',
+							'date; sleep 3; date'
+						]
+					}
+				}));
+			}, 2000);
+			break;
 		case 'status':
 			log.info({
 				status: obj
 			}, 'client status');
+			if (obj.state.completed) {
+				shed.send(JSON.stringify({
+					type: 'discard'
+				}));
+			}
 			break;
 		}
 	});
